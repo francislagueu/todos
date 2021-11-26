@@ -1,0 +1,6 @@
+export enum Status {
+  CREATED = 'CREATED',
+  TOUCHED = 'TOUCHED',
+  DELETED = 'DELETED',
+  COMPLETED = 'COMPLETED',
+}
