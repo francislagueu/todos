@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/models/user.entity';
+import { UserService } from 'src/user/user.service';
 import { TodoCreateDto } from './models/todo-create.dto';
-import { TodoEntity } from './models/todo.entity';
+import { TodoDto } from './models/todo.dto';
 import { TodoRepository } from './todo.repository';
 
 @Injectable()
@@ -10,28 +12,35 @@ export class TodoService {
 
   constructor(
     @InjectRepository(TodoRepository) private todoRepository: TodoRepository,
+    private readonly userService: UserService,
   ) {}
 
-  async getAllTodos(): Promise<TodoEntity[]> {
+  async getAllTodos(): Promise<TodoDto[]> {
     return await this.todoRepository.getAllTodos();
   }
 
-  async getOneTodoById(id: number): Promise<TodoEntity> {
-    return await this.todoRepository.getOneTodo({ id });
+  async getOneTodoById(id: number): Promise<TodoDto> {
+    return await this.todoRepository.getOneTodo({
+      where: { id },
+      relations: ['owner'],
+    });
   }
 
-  async getOneTodo(condition: any): Promise<TodoEntity> {
+  async getOneTodo(condition: any): Promise<TodoDto> {
     return await this.todoRepository.getOneTodo(condition);
   }
 
-  async createTodo(todoDto: TodoCreateDto): Promise<TodoEntity> {
-    return await this.todoRepository.createTodo(todoDto);
+  async createTodo(
+    owner: UserEntity,
+    todoDto: TodoCreateDto,
+  ): Promise<TodoDto> {
+    return await this.todoRepository.createTodo(owner, todoDto);
   }
 
   async updateTodo(
     id: number,
     todoDto: Partial<TodoCreateDto>,
-  ): Promise<TodoEntity> {
+  ): Promise<TodoDto> {
     return await this.todoRepository.updateTodo(id, todoDto);
   }
 
